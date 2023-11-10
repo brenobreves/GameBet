@@ -1,6 +1,5 @@
 {
   "name": "gamebet",
-  "type": "module",
   "version": "1.0.0",
   "description": "API de apostas",
   "main": "app.ts",
