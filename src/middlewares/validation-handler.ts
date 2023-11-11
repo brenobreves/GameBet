@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ObjectSchema } from "joi";
-import { invalidDataError } from "errors/invalid-data-erro";
+import { invalidDataError } from "../errors/invalid-data-erro";
 
 
 export function validateSchema(schema: ObjectSchema) {
