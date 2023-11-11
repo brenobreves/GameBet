@@ -5,10 +5,15 @@
   "main": "app.ts",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "dev": "dotenv -e .env.development nodemon src/server.ts",
+    "dev": "npm run dev:load-envs nodemon src/server.ts",
     "start": "dotenv -e .env npm run migration:run && node dist/server.js",
+    "test": "npm run test:load-envs -- jest -- --coverage --runInBand",
     "migration:run": "prisma migrate deploy",
-    "test": "dotenv -e .env.test jest"
+    "test:load-envs": "dotenv -e .env.test",
+    "dev:load-envs":"dotenv -e .env.development",
+    "dev:migration:run": "npm run dev:load-envs prisma migrate deploy",
+    "test:migration:run": "npm run test:load-envs prisma migrate deploy",
+    "test:migration:generate": "npm run test:load-envs prisma migrate dev"
   },
   "repository": {
     "type": "git",

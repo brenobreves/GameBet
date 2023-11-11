@@ -13,17 +13,7 @@ export function handleApplicationErrors(
       message: err.message,
     });
   }
-
-  if (err.name === 'NotFoundError') {
-    return res.status(httpStatus.NOT_FOUND).send({
-      message: err.message,
-    });
-  }
-
-  if (err.name === 'Forbidden') {
-    return res.status(httpStatus.FORBIDDEN).send(err.message);
-  }
-
+  
   console.error(err);
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
     error: 'InternalServerError',
