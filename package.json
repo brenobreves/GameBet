@@ -7,7 +7,8 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "dotenv -e .env.development nodemon src/server.ts",
     "start": "dotenv -e .env npm run migration:run && node dist/server.js",
-    "migration:run": "prisma migrate deploy"
+    "migration:run": "prisma migrate deploy",
+    "test": "dotenv -e .env.test jest"
   },
   "repository": {
     "type": "git",
