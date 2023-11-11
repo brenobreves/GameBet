@@ -9,5 +9,3 @@ app.get('/health', (req: Request, res: Response) => res.status(httpStatus.OK).se
 app.use(handleApplicationErrors)
 
 export default app;
-const port = process.env.PORT || 4000
-app.listen(port, () => console.log(`Running on port: ${port}`))
