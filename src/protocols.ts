@@ -1,3 +1,5 @@
+import { Participant } from "@prisma/client";
+
 export type ApplicationError = {
     name: string;
     message: string;
@@ -10,3 +12,5 @@ export type RequestError = {
     name: string;
     message: string;
   };
+
+export type CreateParticipant = Omit<Participant, "id"|"createdAt"|"updatedAt">
