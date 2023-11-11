@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "npm run dev:load-envs nodemon src/server.ts",
-    "start": "npm run migration:run && node dist/server.js",
+    "start": "npm run migration:run && node dist/src/server.js",
     "test": "npm run test:load-envs -- jest -- --coverage --runInBand",
     "migration:run": "prisma migrate deploy",
     "test:load-envs": "dotenv -e .env.test",
