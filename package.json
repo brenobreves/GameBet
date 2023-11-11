@@ -5,8 +5,8 @@
   "main": "app.ts",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "dev": "nodemon dist/server.ts",
-    "start": "node src/server.js"
+    "dev": "dotenv -e env.development nodemon src/server.ts",
+    "start": "node dist/server.js"
   },
   "repository": {
     "type": "git",
