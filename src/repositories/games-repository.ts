@@ -7,4 +7,8 @@ async function createGame(game: CreateGame) {
     })
 }
 
-export const gameRepository = { createGame }
+async function getGames() {
+    return await prisma.game.findMany({})
+}
+
+export const gameRepository = { createGame, getGames }

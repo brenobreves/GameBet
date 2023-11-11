@@ -8,6 +8,6 @@ const gamesRouter = Router();
 
 gamesRouter
     .post('/', validateSchema(createGameSchema), gameController.createGame)
-
+    .get('/', gameController.getGames)
 
 export default gamesRouter

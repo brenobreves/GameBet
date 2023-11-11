@@ -9,4 +9,8 @@ async function createGame(game: CreateGame) {
     return await gameRepository.createGame(game)
 }
 
-export const gameServices = { createGame } 
+async function getGames() {
+    return await gameRepository.getGames()
+}
+
+export const gameServices = { createGame, getGames } 

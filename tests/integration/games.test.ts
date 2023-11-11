@@ -64,3 +64,23 @@ describe('POST /games', () => {
         })
     })
 })
+
+describe('GET /games', () => {
+    it('should return all games', async () => {
+        const game1 = await createGame()
+        const game2 = await createGame()
+        const gamesList = await server.get('/games')
+        const expectedGame1 = {
+            ...game1,
+            createdAt: game1.createdAt.toISOString(),
+            updatedAt: game1.updatedAt.toISOString()
+        }
+        const expectedGame2 = {
+            ...game2,
+            createdAt: game2.createdAt.toISOString(),
+            updatedAt: game2.updatedAt.toISOString()
+        }
+        expect(gamesList.body).toEqual([expectedGame1,expectedGame2])
+        expect(gamesList.statusCode).toBe(httpStatus.OK)
+    })
+})

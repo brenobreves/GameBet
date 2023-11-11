@@ -1,5 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
+
 import { CreateParticipant } from "../protocols";
 import { invalidDataError } from "../errors/invalid-data-erro";
 import { participantServices } from "../services/participants-services";
