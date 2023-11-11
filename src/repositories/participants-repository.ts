@@ -7,4 +7,8 @@ async function createParticipant(participant: CreateParticipant) {
     })
 }
 
-export const participantRepository = { createParticipant }
+async function getParticipants() {
+    return await prisma.participant.findMany({})
+}
+
+export const participantRepository = { createParticipant, getParticipants }

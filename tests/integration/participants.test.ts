@@ -3,6 +3,8 @@ import app from "../../src/app";
 import supertest from "supertest"
 import { cleanDb } from "../helpers";
 import httpStatus from "http-status";
+import prisma from "../../src/database";
+import { createParticipant } from "../factories/participant-factory";
 
 const server = supertest(app)
 
@@ -42,7 +44,36 @@ describe('POST /participants', () => {
                 name: expect.any(String),
                 balance: expect.any(Number)
             })
+            const participantCheck = await prisma.participant.findFirst({
+                where:{
+                    id: newParticipantReq.body.id
+                }
+            })
+            const participantExpected = {
+                ...participantCheck,
+                createdAt: participantCheck.createdAt.toISOString(),
+                updatedAt: participantCheck.updatedAt.toISOString()
+            }
+            expect(participantExpected).toEqual(newParticipantReq.body)
         })
     })
+})
 
+describe('GET /participants', () => {
+    it('should return all participants',async () => {
+        const participant1 = await createParticipant()
+        const participant2 = await createParticipant()
+        const participantExpected1 = {
+            ...participant1,
+            createdAt: participant1.createdAt.toISOString(),
+            updatedAt: participant1.updatedAt.toISOString()
+        }
+        const participantExpected2 = {
+            ...participant2,
+            createdAt: participant2.createdAt.toISOString(),
+            updatedAt: participant2.updatedAt.toISOString()
+        }
+        const response = await server.get('/participants')
+        expect(response.body).toEqual([participantExpected1,participantExpected2])
+    })
 })

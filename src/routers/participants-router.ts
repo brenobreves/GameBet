@@ -8,5 +8,6 @@ const participantRouter = Router();
 
 participantRouter
     .post('/', validateSchema(createParticipantSchema), participantController.createParticipant)
+    .get('/', participantController.getParticipants)
 
 export default participantRouter

@@ -11,4 +11,9 @@ async function createParticipant(req: Request, res: Response) {
     return res.status(httpStatus.CREATED).send(create)
 }
 
-export const participantController = { createParticipant }
+async function getParticipants(req: Request, res: Response) {
+    const participantList = await participantServices.getParticipants()
+    return res.status(httpStatus.OK).send(participantList)
+}
+
+export const participantController = { createParticipant, getParticipants }

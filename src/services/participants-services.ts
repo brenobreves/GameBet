@@ -8,4 +8,8 @@ async function createParticipant(participant: CreateParticipant) {
     return create
 }
 
-export const participantServices = { createParticipant }
+async function getParticipants() {
+    return await participantRepository.getParticipants()
+}
+
+export const participantServices = { createParticipant, getParticipants }
