@@ -1,6 +1,6 @@
-import { participantController } from "../controllers/participants-controller";
 import { Router } from "express";
 
+import { participantController } from "../controllers/participants-controller";
 import { validateSchema } from "../middlewares/validation-handler";
 import { createParticipantSchema } from "../schemas/participant-schema";
 
