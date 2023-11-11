@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "dotenv -e .env.development nodemon src/server.ts",
-    "start": "dotenv -e .env dist/server.js"
+    "start": "dotenv -e .env node dist/server.js"
   },
   "repository": {
     "type": "git",
