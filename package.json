@@ -4,8 +4,8 @@
   "description": "API de apostas",
   "main": "app.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "nodemon src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "nodemon dist/server.ts",
     "start": "node src/server.js"
   },
   "repository": {
