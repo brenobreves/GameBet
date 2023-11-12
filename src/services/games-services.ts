@@ -34,12 +34,14 @@ async function finishGame(gameId: number, score: FinishGame) {
     await prisma.$transaction(async (tx) =>{
         const updateGame = await gameRepository.finishGame(gameId,score,tx)
         const updateLostBet = await betRepository.setLostBets(gameId,score,tx)
-        const totalGameBet = await betRepository.getTotalBetByGameId(gameId,tx)
-        const totalCut = Math.floor(totalGameBet._sum.amountBet * 0.7)
         const totalWon = await betRepository.getTotalBetWonByGameId(gameId,score,tx)
-        const earnRate = totalCut/totalWon._sum.amountBet
-        const setWonBet = await betRepository.setWonBets(gameId,score,earnRate,tx)
-        const updateWonBalances = await participantRepository.updateWonBalance(gameId,tx)
+        if(totalWon._sum.amountBet !== 0){
+            const totalGameBet = await betRepository.getTotalBetByGameId(gameId,tx)
+            const totalCut = Math.floor(totalGameBet._sum.amountBet * 0.7)
+            const earnRate = totalCut/totalWon._sum.amountBet
+            const setWonBet = await betRepository.setWonBets(gameId,score,earnRate,tx)
+            const updateWonBalances = await participantRepository.updateWonBalance(gameId,tx)
+        }
         updatedGameObj = updateGame
     })
     return updatedGameObj

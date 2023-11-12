@@ -1,15 +1,13 @@
 import prisma from "../database";
 import { CreateBet, FinishGame } from "../protocols";
 
-async function createBet(bet: CreateBet, client?) {
-    if(!client) client = prisma
+async function createBet(bet: CreateBet, client: any) {
     return await client.bet.create({
         data: bet
     })
 }
 
-async function setLostBets(gameId: number, score: FinishGame, client?) {
-    if(!client) client = prisma
+async function setLostBets(gameId: number, score: FinishGame, client: any) {
     return client.bet.updateMany({
         where: {
             gameId: gameId,
@@ -25,8 +23,7 @@ async function setLostBets(gameId: number, score: FinishGame, client?) {
     })
 }
 
-async function getTotalBetByGameId(gameId: number, client?) {
-    if(!client) client = prisma
+async function getTotalBetByGameId(gameId: number, client: any) {
     return client.bet.aggregate({
         _sum:{
             amountBet:true
@@ -37,8 +34,7 @@ async function getTotalBetByGameId(gameId: number, client?) {
     })
 }
 
-async function getTotalBetWonByGameId(gameId: number, score: FinishGame, client?) {
-    if(!client) client = prisma
+async function getTotalBetWonByGameId(gameId: number, score: FinishGame, client: any) {
     return client.bet.aggregate({
         _sum:{
             amountBet:true
@@ -51,8 +47,7 @@ async function getTotalBetWonByGameId(gameId: number, score: FinishGame, client?
     })
 }
 
-async function setWonBets(gameId: number, score: FinishGame, earnRate: number, client?) {
-    if(!client) client = prisma
+async function setWonBets(gameId: number, score: FinishGame, earnRate: number, client: any) {
     return client.$executeRaw`UPDATE "Bet"
     SET 
       "status" = 'WON',

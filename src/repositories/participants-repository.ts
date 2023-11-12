@@ -19,8 +19,7 @@ async function getParticipantById(id: number) {
     })
 }
 
-async function adjustBalanceById(id:number, newBalance: number, client?) {
-    if(!client) client = prisma
+async function adjustBalanceById(id:number, newBalance: number, client: any) {
     return await client.participant.update({
         where:{
             id
@@ -31,8 +30,7 @@ async function adjustBalanceById(id:number, newBalance: number, client?) {
     })
 }
 
-async function updateWonBalance(gameId: number, client?) {
-    if(!client) client = prisma
+async function updateWonBalance(gameId: number, client: any) {
     return await client.$executeRaw`UPDATE "Participant"
     SET
       "balance" = "Participant"."balance" + COALESCE("totalAmountWon", 0)

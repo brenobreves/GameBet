@@ -7,8 +7,8 @@ import { cleanDb } from "../helpers";
 import prisma from "../../src/database";
 import { createGame } from "../factories/game-factory";
 import { createParticipant } from "../factories/participant-factory";
-import { createBet } from "../factories/bet-factory";
-import { Bet } from "@prisma/client";
+import { createBetsingleParticipant } from "../factories/bet-factory";
+import { Bet, Game } from "@prisma/client";
 
 const server = supertest(app)
 
@@ -108,7 +108,7 @@ describe('GET /games/:id', () => {
         expect(req.text).toEqual(`{\"message\":\"Data not found: Game with id: ${gameId}\"}`)
     })
     it('should return the game info with a related bets array on success',async () => {
-        const {game, participant, betsArr} = await createBet(2)
+        const {game, participant, betsArr} = await createBetsingleParticipant(2)
         const gameWithBets = await server.get(`/games/${game.id}`)
         expect(gameWithBets.statusCode).toBe(httpStatus.OK)
         const expectedGame = {
@@ -128,5 +128,136 @@ describe('GET /games/:id', () => {
             ...expectedGame,
             bets: expectedBetsArr
         })
+    })
+})
+
+describe('POST /games/:id/finish', () => {
+    it('should return a bad request if body doesnt match schema', async () => {
+        const gameId = faker.number.int({min:1,max:100})
+        const wrongBodyResponse = await server.post(`/games/${gameId}/finish`).send({name:faker.person.fullName(), balance:faker.number.float()});
+        const wrongBodyCode = wrongBodyResponse.statusCode
+        expect(wrongBodyCode).toBe(httpStatus.BAD_REQUEST);
+    })
+
+    it('should throw a bad request if id params is not a positive integer number', async () => {
+        const nan = faker.lorem.word()
+        const float = faker.number.float({max:100,min:0})
+        const homeScore = faker.number.int({max:100,min:0})
+        const awayScore = faker.number.int({max:100,min:0})
+        const negative = faker.number.int({max:-1, min:-100})
+        const NaNReq = await server.post(`/games/${nan}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        const floatReq = await server.post(`/games/${float}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        const negativeReq = await server.post(`/games/${negative}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        expect(NaNReq.statusCode).toBe(httpStatus.BAD_REQUEST)
+        expect(floatReq.statusCode).toBe(httpStatus.BAD_REQUEST)
+        expect(negativeReq.statusCode).toBe(httpStatus.BAD_REQUEST)
+        expect(NaNReq.text).toEqual("{\"message\":\"Invalid data: id params must be a integer number\"}")
+        expect(floatReq.text).toEqual("{\"message\":\"Invalid data: id params must be a integer number\"}")
+        expect(negativeReq.text).toEqual("{\"message\":\"Invalid data: id params must be a integer number greater than 0\"}")
+    })
+
+    it('should throw a not found if game is not foud with provided id via params', async () => {
+        const homeScore = faker.number.int({max:100,min:0})
+        const awayScore = faker.number.int({max:100,min:0})
+        const randomId = faker.number.int({max:100,min:0})
+        const noGameReq = await server.post(`/games/${randomId}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        expect(noGameReq.statusCode).toBe(httpStatus.NOT_FOUND)
+        expect(noGameReq.text).toEqual(`{\"message\":\"Data not found: Game with id: ${randomId}\"}`)
+    })
+
+    it('should throw a forbidden error if game is already over', async () => {
+        const homeScore = faker.number.int({max:100,min:0})
+        const awayScore = faker.number.int({max:100,min:0})
+        const game = await createGame(true)
+        const gameOverReq = await server.post(`/games/${game.id}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        expect(gameOverReq.statusCode).toBe(httpStatus.FORBIDDEN)
+        expect(gameOverReq.text).toEqual(`{\"message\":\"Forbidden action: Game with id: ${game.id} is already over\"}`)
+    })
+
+    it('if everything is ok should set isFinished to true', async () => {
+        const homeScore = faker.number.int({max:100,min:0})
+        const awayScore = faker.number.int({max:100,min:0})
+        const game = await createGame()
+        const okGame = await server.post(`/games/${game.id}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        expect(okGame.statusCode).toBe(httpStatus.OK)
+
+        const expectedBody = {
+            ...game,
+            homeTeamScore: homeScore,
+            awayTeamScore: awayScore,
+            isFinished:true,
+            createdAt: game.createdAt.toISOString(),
+            updatedAt:game.updatedAt.toISOString()
+
+        }
+        expect(okGame.body).toEqual(expectedBody)
+
+        const gameCheck = await prisma.game.findFirst({
+            where:{
+                id:game.id
+            }
+        })
+
+        expect(gameCheck.isFinished).toBe(true)
+    })
+
+    it('after closing games no bet related should be pending', async () => {
+        const homeScore = faker.number.int({max:100,min:0})
+        const awayScore = faker.number.int({max:100,min:0})
+        const { game } = await createBetsingleParticipant(3)
+        const okGame = await server.post(`/games/${game.id}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        const pendingBets = await prisma.bet.findMany({
+            where:{
+                gameId:game.id,
+                status:"PENDING"
+            }
+        })
+        expect(pendingBets).toHaveLength(0)
+    })
+
+    it('should set the corret status and amountWon to bets', async () => {
+        const { game, participant, betsArr } = await createBetsingleParticipant(3)
+        const homeScore = betsArr[0].homeTeamScore
+        const awayScore = betsArr[0].awayTeamScore
+        const okGame = await server.post(`/games/${game.id}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        const lostBetCheck = await prisma.bet.findMany({
+            where:{
+                gameId: game.id,
+                OR: [
+                  { homeTeamScore: { not: homeScore } },
+                  { awayTeamScore: { not: awayScore } },
+                ]
+              }
+        })
+        for(let  i = 0 ; i < lostBetCheck.length ; i++){
+            expect(lostBetCheck[i].status).toBe("LOST")
+            expect(lostBetCheck[i].amountWon).toBe(0)
+        }
+        const wonBetCheck = await prisma.bet.findMany({
+            where:{
+                gameId: game.id,
+                AND: [
+                  { homeTeamScore:homeScore},
+                  { awayTeamScore:awayScore},
+                ]
+              }
+        })
+        for(let  i = 0 ; i < wonBetCheck.length ; i++){
+            expect(wonBetCheck[i].status).toBe("WON")
+            expect(wonBetCheck[i].amountWon).toBeGreaterThan(0)
+        }
+    })
+    it('should update winning participants balance',async () => {
+        const { game, participant, betsArr } = await createBetsingleParticipant(3)
+        const homeScore = betsArr[0].homeTeamScore
+        const awayScore = betsArr[0].awayTeamScore
+        const okGame = await server.post(`/games/${game.id}/finish`).send({homeTeamScore: homeScore, awayTeamScore: awayScore})
+        const afterGame = await prisma.participant.findFirst({
+            where:{
+                id:participant.id
+            }
+        })
+        // factories create bets with no cost to balance, by forcing at least a winning bet, the participant should have its balance increased
+        expect(afterGame.balance).toBeGreaterThan(participant.balance)
     })
 })

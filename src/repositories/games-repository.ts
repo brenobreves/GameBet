@@ -30,8 +30,7 @@ async function getGameWithBets(id: number) {
     })
 }
 
-async function finishGame(id: number, score: FinishGame, client?) {
-    if(!client) client = prisma
+async function finishGame(id: number, score: FinishGame, client: any) {
     return await client.game.update({
         where:{
             id

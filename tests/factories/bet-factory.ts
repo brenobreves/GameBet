@@ -2,9 +2,9 @@ import prisma from "../../src/database";
 import { faker } from "@faker-js/faker"
 import { createGame } from "./game-factory";
 import { createParticipant } from "./participant-factory";
-import { Bet } from "@prisma/client";
+import { Bet, Participant } from "@prisma/client";
 
-export async function createBet(betNum = 1) {
+export async function createBetsingleParticipant(betNum = 1) {
     const game = await createGame()
     const participant = await createParticipant(10000)
     const betsArr: Array<Bet> = []
