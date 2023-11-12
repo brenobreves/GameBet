@@ -6,6 +6,9 @@ import httpStatus from "http-status";
 import { cleanDb } from "../helpers";
 import prisma from "../../src/database";
 import { createGame } from "../factories/game-factory";
+import { createParticipant } from "../factories/participant-factory";
+import { createBet } from "../factories/bet-factory";
+import { Bet } from "@prisma/client";
 
 const server = supertest(app)
 
@@ -83,5 +86,47 @@ describe('GET /games', () => {
         }
         expect(gamesList.body).toEqual([expectedGame1,expectedGame2])
         expect(gamesList.statusCode).toBe(httpStatus.OK)
+    })
+})
+
+describe('GET /games/:id', () => {
+    it('should throw a bad request if id params is not a positive integer number',async () => {
+        const NaNReq = await server.get('/games/abc')
+        const floatReq = await server.get('/games/2.5')
+        const negativeReq = await server.get('/games/-1')
+        expect(NaNReq.statusCode).toBe(httpStatus.BAD_REQUEST)
+        expect(floatReq.statusCode).toBe(httpStatus.BAD_REQUEST)
+        expect(negativeReq.statusCode).toBe(httpStatus.BAD_REQUEST)
+        expect(NaNReq.text).toEqual("{\"message\":\"Invalid data: id params must be a integer number\"}")
+        expect(floatReq.text).toEqual("{\"message\":\"Invalid data: id params must be a integer number\"}")
+        expect(negativeReq.text).toEqual("{\"message\":\"Invalid data: id params must be a integer number greater than 0\"}")
+    })
+    it('should throw a not found error if game with id is not found',async () => {
+        const gameId = faker.number.int({min:1, max:100000})
+        const req = await server.get(`/games/${gameId}`)
+        expect(req.statusCode).toBe(httpStatus.NOT_FOUND)
+        expect(req.text).toEqual(`{\"message\":\"Data not found: Game with id: ${gameId}\"}`)
+    })
+    it('should return the game info with a related bets array on success',async () => {
+        const {game, participant, betsArr} = await createBet(2)
+        const gameWithBets = await server.get(`/games/${game.id}`)
+        expect(gameWithBets.statusCode).toBe(httpStatus.OK)
+        const expectedGame = {
+            ...game,
+            createdAt: game.createdAt.toISOString(),
+            updatedAt: game.updatedAt.toISOString()
+        }
+        const expectedBetsArr = []
+        for(let i = 0 ; i < betsArr.length ; i++){
+            expectedBetsArr.push({
+                ...betsArr[i],
+                createdAt: betsArr[i].createdAt.toISOString(),
+                updatedAt: betsArr[i].updatedAt.toISOString()
+            })
+        }
+        expect(gameWithBets.body).toEqual({
+            ...expectedGame,
+            bets: expectedBetsArr
+        })
     })
 })

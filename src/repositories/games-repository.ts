@@ -19,4 +19,15 @@ async function getGameById(id: number) {
     })
 }
 
-export const gameRepository = { createGame, getGames, getGameById }
+async function getGameWithBets(id: number) {
+    return prisma.game.findFirst({
+        where:{
+            id
+        },
+        include:{
+            Bet:true
+        }
+    })
+}
+
+export const gameRepository = { createGame, getGames, getGameById, getGameWithBets }

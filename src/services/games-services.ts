@@ -1,6 +1,7 @@
 import { gameRepository } from "../repositories/games-repository";
 import { CreateGame } from "../protocols";
 import { invalidDataError } from "../errors/invalid-data-erro";
+import { NotFoundError } from "../errors/not-found-erro";
 
 async function createGame(game: CreateGame) {
     if(!isNaN(Number(game.awayTeamName)) || !isNaN(Number(game.homeTeamName))){
@@ -13,4 +14,10 @@ async function getGames() {
     return await gameRepository.getGames()
 }
 
-export const gameServices = { createGame, getGames } 
+async function getGameWithBets(gameId: number) {
+    const gameInfo = await gameRepository.getGameWithBets(gameId)
+    if(!gameInfo) throw NotFoundError(`Game with id: ${gameId}`)
+    return gameInfo
+}
+
+export const gameServices = { createGame, getGames, getGameWithBets } 
