@@ -17,8 +17,8 @@ async function createBet(bet: CreateBet) {
     const newBalance = saldo - bet.amountBet
     let returnBet:any = {}
     await prisma.$transaction(async (tx) =>{
-        const createBet = await betRepository.createBet(bet)
-        const adjustBalance = await participantRepository.adjustBalanceById(bet.participantId, newBalance)
+        const createBet = await betRepository.createBet(bet, tx)
+        const adjustBalance = await participantRepository.adjustBalanceById(123, newBalance, tx)
         returnBet = createBet
     })
     return returnBet

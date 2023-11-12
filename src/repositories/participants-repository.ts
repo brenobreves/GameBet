@@ -19,8 +19,9 @@ async function getParticipantById(id: number) {
     })
 }
 
-async function adjustBalanceById(id:number, newBalance: number) {
-    return prisma.participant.update({
+async function adjustBalanceById(id:number, newBalance: number, client?) {
+    if(!client) client = prisma
+    return client.participant.update({
         where:{
             id
         },

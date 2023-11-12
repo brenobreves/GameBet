@@ -1,8 +1,9 @@
 import prisma from "../database";
 import { CreateBet } from "../protocols";
 
-async function createBet(bet: CreateBet) {
-    return await prisma.bet.create({
+async function createBet(bet: CreateBet, client?) {
+    if(!client) client = prisma
+    return await client.bet.create({
         data: bet
     })
 }
