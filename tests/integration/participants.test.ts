@@ -1,8 +1,9 @@
 import { faker } from "@faker-js/faker";
 import app from "../../src/app";
-import supertest from "supertest"
-import { cleanDb } from "../helpers";
+import supertest from "supertest";
 import httpStatus from "http-status";
+
+import { cleanDb } from "../helpers";
 import prisma from "../../src/database";
 import { createParticipant } from "../factories/participant-factory";
 
