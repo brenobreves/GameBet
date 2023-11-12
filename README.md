@@ -13,7 +13,7 @@ To test, and use the live server running this API you can use the following link
 
 https://gamebet-api.onrender.com
 
-# Routes
+# Routes:
 
 ## POST "/participants":
 Description: register a new participant
