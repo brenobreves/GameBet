@@ -16,13 +16,18 @@ https://gamebet-api.onrender.com
 # Routes:
 
 ## POST "/participants":
+
 Description: register a new participant
+
 Expected Body: 
+
 {
 	name: string;     // Any user name is accepted 
 	balance: number; // Represented in cents ($ 10,00 -> 1000)
 }
+
 Response Body:
+
 {
 	id: number;
 	createdAt: string;
@@ -33,12 +38,16 @@ Response Body:
 
 ## POST "/games":
 Description: register a new game
+
 Expected Body: 
+
 {
 	homeTeamName: string; // Team names must not be a number or numeric string
 	awayTeamName: string;
 }
+
 Response Body:
+
 {
 	id: number;
 	createdAt: string;
