@@ -15,7 +15,7 @@ https://gamebet-api.onrender.com
 
 # Routes
 
-# POST "/participants":
+## POST "/participants":
 Description: register a new participant
 Expected Body: 
 {
@@ -31,7 +31,7 @@ Response Body:
 	balance: number; // Represented in cents ($ 10,00 -> 1000)
 }
 
-# POST "/games":
+## POST "/games":
 Description: register a new game
 Expected Body: 
 {
@@ -50,7 +50,7 @@ Response Body:
 	isFinished: boolean;    // By default starts with false
 }
 
-# POST "/bets":
+## POST "/bets":
 Description: register a new bet, subtracting credits from participant balance
 Expected Body: 
 { 
@@ -74,7 +74,7 @@ Response Body:
 	amountWon: number || null; // null while PENDING; number if WON oor LOST, also represented in cents ($ 10,00 -> 1000)
 }
 
-# POST "/games/:id/finish":
+## POST "/games/:id/finish":
 Description: Finish a game with the provided ":id" and teams scores,updating related bets and participants balances in case of a correct guess.
 Game must not be over. 
 Expected Body: 
@@ -94,7 +94,7 @@ Response Body:
 	isFinished: boolean;    // True
 }
 
-# GET "/participants":
+## GET "/participants":
 Description: Returns an array with all registered participants infos.
 Game must not be over. 
 Response Body:
@@ -109,7 +109,7 @@ Response Body:
 	{...}
 ]
 
-# GET "/games":
+## GET "/games":
 Description: Returns an array with all registered games infos.
 Game could be over or not. 
 Response Body:
@@ -127,7 +127,7 @@ Response Body:
 	{...}
 ]
 
-# GET "/games/:id":
+## GET "/games/:id":
 Description: Returns infos of the game related to the provided ":id" along with a all related bets infos in an array.
 Game could be over or not. 
 Response Body:
@@ -154,7 +154,7 @@ Response Body:
 	}[]
 }
 
-## How to run for development
+# How to run for development
 
 1. Clone this repository
 2. Install all dependencies
@@ -177,7 +177,7 @@ npm run dev:migration:run
 npm run dev
 ```
 
-## How to run tests
+# How to run tests
 
 1. Follow the steps in the last section
 2. Configure the `.env.test` file using the `.env.example`
@@ -193,7 +193,7 @@ npm run test:migration:run
 npm run test
 ```
 
-## Building and starting for production
+# Building and starting for production
 
 1. Configure the `.env` file using the `.env.example`
 2. Run commands:
