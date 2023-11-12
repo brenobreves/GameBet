@@ -22,8 +22,11 @@ Description: register a new participant
 Expected Body: 
 
 {
+
 	name: string;     // Any user name is accepted 
+
 	balance: number; // Represented in cents ($ 10,00 -> 1000)
+    
 }
 
 Response Body:
