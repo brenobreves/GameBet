@@ -20,6 +20,12 @@ export function handleApplicationErrors(
     })
   }
   
+  if (err.name === 'Forbidden') {
+    return res.status(httpStatus.FORBIDDEN).send({
+      message: err.message
+    })
+  }
+  
   console.error(err);
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
     error: 'InternalServerError',

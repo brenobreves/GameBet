@@ -18,3 +18,5 @@ export type ApplicationError = {
   export type CreateGame = Omit<Game , "id"|"createdAt"|"updatedAt"|"homeTeamScore"|"awayTeamScore"|"isFinished">
 
   export type CreateBet = Omit<Bet, "id"|"createdAt"|"updatedAt"|"status"|"amountWon">
+
+  export type FinishGame = Omit<Game, "id"|"createdAt"|"updatedAt"|"homeTeamName"|"awayTeamName"|"isFinished">

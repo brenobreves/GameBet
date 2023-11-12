@@ -1,5 +1,5 @@
 import prisma from "../database";
-import { CreateGame } from "../protocols";
+import { CreateGame, FinishGame } from "../protocols";
 
 async function createGame(game: CreateGame) {
     return await prisma.game.create({
@@ -12,7 +12,7 @@ async function getGames() {
 }
 
 async function getGameById(id: number) {
-    return prisma.game.findFirst({
+    return await prisma.game.findFirst({
         where:{
             id
         }
@@ -20,7 +20,7 @@ async function getGameById(id: number) {
 }
 
 async function getGameWithBets(id: number) {
-    return prisma.game.findFirst({
+    return await prisma.game.findFirst({
         where:{
             id
         },
@@ -30,4 +30,18 @@ async function getGameWithBets(id: number) {
     })
 }
 
-export const gameRepository = { createGame, getGames, getGameById, getGameWithBets }
+async function finishGame(id: number, score: FinishGame, client?) {
+    if(!client) client = prisma
+    return await client.game.update({
+        where:{
+            id
+        },
+        data:{
+            isFinished: true,
+            homeTeamScore: score.homeTeamScore,
+            awayTeamScore: score.awayTeamScore
+        }
+    })
+}
+
+export const gameRepository = { createGame, getGames, getGameById, getGameWithBets, finishGame }
