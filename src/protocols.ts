@@ -1,4 +1,4 @@
-import { Game, Participant } from "@prisma/client";
+import { Bet, Game, Participant } from "@prisma/client";
 
 export type ApplicationError = {
     name: string;
@@ -16,3 +16,5 @@ export type ApplicationError = {
   export type CreateParticipant = Omit<Participant, "id"|"createdAt"|"updatedAt">
 
   export type CreateGame = Omit<Game , "id"|"createdAt"|"updatedAt"|"homeTeamScore"|"awayTeamScore"|"isFinished">
+
+  export type CreateBet = Omit<Bet, "id"|"createdAt"|"updatedAt"|"status"|"amountWon">

@@ -14,7 +14,7 @@ model Bet {
   homeTeamScore Int
   awayTeamScore Int
   amountBet     Int
-  status        String
+  status        BetStatus   @default(PENDING)
   amountWon     Int?
   participantId Int
   gameId        Int
@@ -23,14 +23,14 @@ model Bet {
 }
 
 model Game {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
   homeTeamName  String
   awayTeamName  String
-  homeTeamScore Int @default(0)
-  awayTeamScore Int @default(0)
-  isFinished    Boolean @default(false)
+  homeTeamScore Int       @default(0)
+  awayTeamScore Int       @default(0)
+  isFinished    Boolean   @default(false)
   Bet           Bet[]
 }
 
@@ -41,4 +41,10 @@ model Participant {
   name      String
   balance   Int
   Bet       Bet[]
+}
+
+enum BetStatus {
+  PENDING
+  WON
+  LOST
 }
