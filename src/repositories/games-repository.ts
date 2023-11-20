@@ -1,5 +1,5 @@
 import prisma from "../database";
-import { CreateGame, FinishGame } from "../protocols";
+import { CreateGame, FinishGame, TransactionClient } from "../protocols";
 
 async function createGame(game: CreateGame) {
     return await prisma.game.create({
@@ -30,7 +30,7 @@ async function getGameWithBets(id: number) {
     })
 }
 
-async function finishGame(id: number, score: FinishGame, client: any) {
+async function finishGame(id: number, score: FinishGame, client:TransactionClient) {
     return await client.game.update({
         where:{
             id

@@ -9,23 +9,14 @@ export function handleApplicationErrors(
   next: NextFunction,
 ) {
   if (err.name === 'InvalidDataError') {
-    return res.status(httpStatus.BAD_REQUEST).send({
-      message: err.message,
-    });
+    return res.status(httpStatus.BAD_REQUEST).send({message: err.message});
   }
-
   if (err.name === 'NotFoundError') {
-    return res.status(httpStatus.NOT_FOUND).send({
-      message: err.message
-    })
+    return res.status(httpStatus.NOT_FOUND).send({message: err.message})
   }
-  
   if (err.name === 'Forbidden') {
-    return res.status(httpStatus.FORBIDDEN).send({
-      message: err.message
-    })
+    return res.status(httpStatus.FORBIDDEN).send({message: err.message})
   }
-  
   console.error(err);
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
     error: 'InternalServerError',

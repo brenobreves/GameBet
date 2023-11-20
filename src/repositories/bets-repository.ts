@@ -1,13 +1,12 @@
-import prisma from "../database";
-import { CreateBet, FinishGame } from "../protocols";
+import { CreateBet, FinishGame, TransactionClient } from "../protocols";
 
-async function createBet(bet: CreateBet, client: any) {
+async function createBet(bet: CreateBet, client:TransactionClient) {
     return await client.bet.create({
         data: bet
     })
 }
 
-async function setLostBets(gameId: number, score: FinishGame, client: any) {
+async function setLostBets(gameId: number, score: FinishGame, client:TransactionClient) {
     return client.bet.updateMany({
         where: {
             gameId: gameId,
@@ -23,7 +22,7 @@ async function setLostBets(gameId: number, score: FinishGame, client: any) {
     })
 }
 
-async function getTotalBetByGameId(gameId: number, client: any) {
+async function getTotalBetByGameId(gameId: number, client:TransactionClient) {
     return client.bet.aggregate({
         _sum:{
             amountBet:true
@@ -34,7 +33,7 @@ async function getTotalBetByGameId(gameId: number, client: any) {
     })
 }
 
-async function getTotalBetWonByGameId(gameId: number, score: FinishGame, client: any) {
+async function getTotalBetWonByGameId(gameId: number, score: FinishGame, client:TransactionClient) {
     return client.bet.aggregate({
         _sum:{
             amountBet:true
@@ -47,15 +46,15 @@ async function getTotalBetWonByGameId(gameId: number, score: FinishGame, client:
     })
 }
 
-async function setWonBets(gameId: number, score: FinishGame, earnRate: number, client: any) {
+async function setWonBets(filter:{gameId: number;score: FinishGame;}, earnRate: number, client:TransactionClient) {
     return client.$executeRaw`UPDATE "Bet"
     SET 
       "status" = 'WON',
       "amountWon" = FLOOR("amountBet"*${earnRate})
     WHERE
-      "gameId" = ${gameId}
-      AND "homeTeamScore" = ${score.homeTeamScore}
-      AND "awayTeamScore" = ${score.awayTeamScore};
+      "gameId" = ${filter.gameId}
+      AND "homeTeamScore" = ${filter.score.homeTeamScore}
+      AND "awayTeamScore" = ${filter.score.awayTeamScore};
     `
 }
 

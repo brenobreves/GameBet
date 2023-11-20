@@ -1,5 +1,5 @@
 import prisma from "../database";
-import { CreateParticipant } from "../protocols";
+import { CreateParticipant, TransactionClient } from "../protocols";
 
 async function createParticipant(participant: CreateParticipant) {
     return await prisma.participant.create({
@@ -19,7 +19,7 @@ async function getParticipantById(id: number) {
     })
 }
 
-async function adjustBalanceById(id:number, newBalance: number, client: any) {
+async function adjustBalanceById(id:number, newBalance: number, client:TransactionClient) {
     return await client.participant.update({
         where:{
             id
@@ -30,7 +30,7 @@ async function adjustBalanceById(id:number, newBalance: number, client: any) {
     })
 }
 
-async function updateWonBalance(gameId: number, client: any) {
+async function updateWonBalance(gameId: number, client:TransactionClient) {
     return await client.$executeRaw`UPDATE "Participant"
     SET
       "balance" = "Participant"."balance" + COALESCE("totalAmountWon", 0)
@@ -48,4 +48,5 @@ async function updateWonBalance(gameId: number, client: any) {
     WHERE
       "Participant"."id" = "TotalAmounts"."participantId";`
 }
+
 export const participantRepository = { createParticipant, getParticipants, getParticipantById, adjustBalanceById, updateWonBalance }

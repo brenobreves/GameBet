@@ -1,5 +1,5 @@
 import { participantRepository } from "../repositories/participants-repository";
-import { CreateBet } from "../protocols";
+import { CreateBet, TransactionClient } from "../protocols";
 import { invalidDataError } from "../errors/invalid-data-erro";
 import { gameRepository } from "../repositories/games-repository";
 import prisma from "../database";
@@ -16,7 +16,7 @@ async function createBet(bet: CreateBet) {
     if(game.isFinished) throw invalidDataError("Game is already over")
     const newBalance = saldo - bet.amountBet
     let returnBet:any = {}
-    await prisma.$transaction(async (tx) =>{
+    await prisma.$transaction(async (tx:TransactionClient) =>{
         const createBet = await betRepository.createBet(bet, tx)
         const adjustBalance = await participantRepository.adjustBalanceById(bet.participantId, newBalance, tx)
         returnBet = createBet

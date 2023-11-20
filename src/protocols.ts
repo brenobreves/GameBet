@@ -1,4 +1,5 @@
-import { Bet, Game, Participant } from "@prisma/client";
+import { Bet, Game, Participant, PrismaClient, Prisma } from "@prisma/client";
+import { DefaultArgs } from "@prisma/client/runtime/library";
 
 export type ApplicationError = {
     name: string;
@@ -20,3 +21,5 @@ export type ApplicationError = {
   export type CreateBet = Omit<Bet, "id"|"createdAt"|"updatedAt"|"status"|"amountWon">
 
   export type FinishGame = Omit<Game, "id"|"createdAt"|"updatedAt"|"homeTeamName"|"awayTeamName"|"isFinished">
+
+  export type TransactionClient = Omit<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">

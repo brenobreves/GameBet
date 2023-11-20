@@ -1,7 +1,7 @@
 import prisma from "../database";
 
 import { gameRepository } from "../repositories/games-repository";
-import { CreateGame, FinishGame } from "../protocols";
+import { CreateGame, FinishGame, TransactionClient } from "../protocols";
 import { invalidDataError } from "../errors/invalid-data-erro";
 import { NotFoundError } from "../errors/not-found-erro";
 import { ForbiddenError } from "../errors/forbidden-erro";
@@ -31,15 +31,17 @@ async function finishGame(gameId: number, score: FinishGame) {
     if(!game) throw NotFoundError(`Game with id: ${gameId}`)
     if(game.isFinished) throw ForbiddenError(`Game with id: ${gameId} is already over`)
     let updatedGameObj = {}
-    await prisma.$transaction(async (tx) =>{
+    const houseFee = 0.3
+    await prisma.$transaction(async (tx:TransactionClient) =>{
         const updateGame = await gameRepository.finishGame(gameId,score,tx)
         const updateLostBet = await betRepository.setLostBets(gameId,score,tx)
         const totalWon = await betRepository.getTotalBetWonByGameId(gameId,score,tx)
         if(totalWon._sum.amountBet !== 0){
             const totalGameBet = await betRepository.getTotalBetByGameId(gameId,tx)
-            const totalCut = Math.floor(totalGameBet._sum.amountBet * 0.7)
+            const totalCut = Math.floor(totalGameBet._sum.amountBet * (1-houseFee))
             const earnRate = totalCut/totalWon._sum.amountBet
-            const setWonBet = await betRepository.setWonBets(gameId,score,earnRate,tx)
+            const queryFilter = {gameId,score}
+            const setWonBet = await betRepository.setWonBets(queryFilter,earnRate,tx)
             const updateWonBalances = await participantRepository.updateWonBalance(gameId,tx)
         }
         updatedGameObj = updateGame
