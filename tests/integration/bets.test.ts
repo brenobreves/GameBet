@@ -34,6 +34,19 @@ describe('POST /bets', () => {
         expect(wrongBodyCode).toBe(httpStatus.BAD_REQUEST);
     })
 
+    it('should return a bad request if bet isnt greater than 0', async () => {
+        const wrongBodyResponse = await server.post("/bets").send(
+            {
+            homeTeamScore:faker.animal.bear(),
+            awayTeamScore:faker.airline.aircraftType(),
+            amountBet:faker.number.int({min:-100,max:0}),
+            gameId:faker.number.int({min:1,max:100}),
+            participantId:faker.number.int({min:1,max:100})
+            });
+        const wrongBodyCode = wrongBodyResponse.statusCode
+        expect(wrongBodyCode).toBe(httpStatus.BAD_REQUEST);
+    })
+
     describe("If body is OK", () => {
         it('should return a not found if participant doesnt exist', async () => {           
             const bet = {
@@ -99,6 +112,26 @@ describe('POST /bets', () => {
             const message = gameOverResponse.text
             expect(message).toEqual(`{\"message\":\"Invalid data: Game is already over\"}`)
         })
+
+        it('should decrease participant balance on success',async () => {
+            const participant = await createParticipant(10000)   
+            const game = await createGame()
+            const bet = {
+                homeTeamScore:faker.number.int({min:0,max:100}),
+                awayTeamScore:faker.number.int({min:0,max:100}),
+                amountBet:faker.number.int({min:1,max:participant.balance}),
+                gameId: game.id,
+                participantId: participant.id
+                }
+            const newBetResponse = await server.post('/bets').send(bet)
+            const partAfterBet = await prisma.participant.findFirst({
+                where:{
+                    id:participant.id
+                }
+            })
+            expect(partAfterBet.balance).toBe(participant.balance-bet.amountBet)
+        })
+
         it('should create and return the bet infos if everything is OK',async () => {
             const participant = await createParticipant(10000)   
             const game = await createGame()
