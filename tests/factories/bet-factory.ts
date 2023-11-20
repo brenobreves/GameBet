@@ -2,7 +2,7 @@ import prisma from "../../src/database";
 import { faker } from "@faker-js/faker"
 import { createGame } from "./game-factory";
 import { createParticipant } from "./participant-factory";
-import { Bet, Participant } from "@prisma/client";
+import { Bet } from "@prisma/client";
 
 export async function createBetsingleParticipant(betNum = 1) {
     const game = await createGame()
